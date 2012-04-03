@@ -65,8 +65,8 @@ class ParanoiaTest < Test::Unit::TestCase
     assert_equal false, model.deleted_at.nil?
     assert model.frozen?
 
-    assert_equal 0, model.class.count
-    assert_equal 1, model.class.unscoped.count
+    assert_equal 0, model.class.alive.count
+    assert_equal 1, model.class.count
 
   end
 
@@ -79,21 +79,21 @@ class ParanoiaTest < Test::Unit::TestCase
 
     assert_equal false, model.deleted_at.nil?
 
-    assert_equal 0, model.class.count
-    assert_equal 1, model.class.unscoped.count
+    assert_equal 0, model.class.alive.count
+    assert_equal 1, model.class.count
   end
 
-  def test_only_destroyed_scope_for_paranoid_models
+  def test_destroyed_scope_for_paranoid_models
     model = ParanoidModel.new
     model.save
     model.destroy
     model2 = ParanoidModel.new
     model2.save
 
-    assert_equal model, ParanoidModel.only_deleted.last
-    assert_equal false, ParanoidModel.only_deleted.include?(model2)
+    assert_equal model, ParanoidModel.deleted.last
+    assert_equal false, ParanoidModel.deleted.include?(model2)
   end
-  
+
   def test_delete_behavior_for_callbacks
     model = CallbackModel.new
     model.save
@@ -116,7 +116,7 @@ class ParanoiaTest < Test::Unit::TestCase
     
     assert model.destroyed?
     
-    model = ParanoidModel.only_deleted.find(id)
+    model = ParanoidModel.deleted.find(id)
     model.restore!
     
     assert_equal false, model.destroyed?
